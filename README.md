@@ -44,7 +44,7 @@ https://dl.espressif.com/dl/package_esp32_index.json
 
 Go to **Tools → Board → Boards Manager**, search for **ESP32**, and install **version 1.0.6**.
 
-> ⚠️ Use **ESP32 core version 1.6.0**, newer versions may cause PS3 library incompatibility.
+> ⚠️ Use **ESP32 core version 1.0.6**, newer versions may cause PS3 library incompatibility.
 
 ---
 
