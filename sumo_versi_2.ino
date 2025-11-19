@@ -1,6 +1,5 @@
 #include <Ps3Controller.h>
 
-// ========== KONFIGURASI PIN (Menggunakan pin dari sumo versi 1.txt) ==========
 int ena_kanan = 12;
 int ena_kiri = 14;
 int RPWM_kanan = 13;
@@ -16,19 +15,18 @@ const int pwm_channel2 = 2;
 const int pwm_channel3 = 3;
 const int resolution = 8;
 
-// ========== FUNGSI GERAKAN (Logika disesuaikan dengan soccer fix.txt) ==========
 void kanan() {
-  ledcWrite(pwm_channel, pwm_ki);
-  ledcWrite(pwm_channel1, 0);
-  ledcWrite(pwm_channel2, pwm_ka);
-  ledcWrite(pwm_channel3, 0);
-}
-
-void kiri() {
   ledcWrite(pwm_channel, 0);
   ledcWrite(pwm_channel1, pwm_ki);
   ledcWrite(pwm_channel2, 0);
   ledcWrite(pwm_channel3, pwm_ka);
+}
+
+void kiri() {
+  ledcWrite(pwm_channel, pwm_ki);
+  ledcWrite(pwm_channel1, 0);
+  ledcWrite(pwm_channel2, pwm_ka);
+  ledcWrite(pwm_channel3, 0);
 }
 
 void maju() {
@@ -45,7 +43,6 @@ void mundur() {
   ledcWrite(pwm_channel3, pwm_ka);
 }
 
-// Fungsi gerakan serong (Logika baru dari soccer fix.txt)
 void maju_kiri() {
   ledcWrite(pwm_channel, 0);
   ledcWrite(pwm_channel1, pwm_ki / 2);
@@ -82,8 +79,9 @@ void stopped() {
 }
 
 void setup() {
-  Serial.begin(9600); // Inisialisasi Serial Monitor
-  Ps3.begin("55:aa:44:f4:88:98"); // MAC Address dari sumo versi 1.txt
+  Serial.begin(9600); 
+  Ps3.begin("55:aa:44:f4:88:98");
+  
   ledcSetup(pwm_channel, frequency, resolution);
   ledcSetup(pwm_channel1, frequency, resolution);
   ledcSetup(pwm_channel2, frequency, resolution);
@@ -106,7 +104,7 @@ void loop() {
     digitalWrite(ena_kiri, HIGH);
 
     bool isMoving = false;
-    // Kecepatan ditentukan oleh tombol R1 atau L1
+    
     int speed;
     const char* speed_mode_text;
     if (Ps3.data.button.r1 || Ps3.data.button.l1) {
@@ -117,11 +115,9 @@ void loop() {
       speed_mode_text = "";
     }
 
-    // ========== KONTROL MENGGUNAKAN LEFT ANALOG STICK ==========
     int ly = Ps3.data.analog.stick.ly;
     int lx = Ps3.data.analog.stick.lx;
 
-    // Gerakan diagonal
     if (ly < -50 && lx < -50) {
       pwm_ki = speed;
       pwm_ka = speed;
@@ -147,7 +143,6 @@ void loop() {
       Serial.print("L3: mundur kanan"); Serial.println(speed_mode_text);
       isMoving = true;
     }
-    // Gerakan lurus
     else if (ly < -50) {
       pwm_ki = speed;
       pwm_ka = speed;
@@ -160,7 +155,8 @@ void loop() {
       Serial.print("L3: mundur"); Serial.println(speed_mode_text);
       isMoving = true;
     } else if (lx < -50) {
-      pwm_ki = speed; pwm_ka = speed;
+      pwm_ki = speed;
+      pwm_ka = speed;
       kiri();
       Serial.print("L3: kiri"); Serial.println(speed_mode_text);
       isMoving = true;
@@ -171,9 +167,7 @@ void loop() {
       isMoving = true;
     }
 
-    // ========== KONTROL MENGGUNAKAN D-PAD (HANYA JIKA ANALOG TIDAK DIGUNAKAN) ==========
     if (!isMoving) {
-      // Gerakan diagonal D-pad
       if (Ps3.data.button.up && Ps3.data.button.left) {
         pwm_ki = speed;
         pwm_ka = speed;
@@ -199,7 +193,6 @@ void loop() {
         Serial.print("D-pad: mundur kanan"); Serial.println(speed_mode_text);
         isMoving = true;
       }
-      // Gerakan lurus D-pad
       else if (Ps3.data.button.up) {
         pwm_ki = speed;
         pwm_ka = speed;
@@ -227,7 +220,6 @@ void loop() {
       }
     }
 
-    // Jika tidak ada input gerakan sama sekali, berhenti
     if (!isMoving) {
       stopped();
       Serial.println("stop");
